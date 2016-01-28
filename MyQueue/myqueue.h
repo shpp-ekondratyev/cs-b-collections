@@ -1,105 +1,142 @@
+/* File: myqueue.h
+ * -----------------------------------------------------
+ * This file exports a simple version of the Queue class
+ * based on the linked list.
+ */
+
 #ifndef MYQUEUE_H
 #define MYQUEUE_H
 
-#include <cassert>
 #include <iostream>
 
-template<typename T>
-class MyQueue
-{
+/* Class: MyQueue<T>
+ * -------------------------------------------------------
+ * This clas implements queue of a specified ValueType (T)
+ * elements
+ */
+template <typename T>
+class MyQueue{
 private:
-    T *queuePtr;     // a pointer to a queue
-    const int size;  // the maximum number of items in the queue
-    int begin,       // queue
-        end;         // the end of the queue
-    int elemCT;      // counter items
+    /* Structure for saving elements of the queue */
+    struct Node{
+        T value;
+        Node* link;
+    };
+    /* Links for the linked list */
+    Node* top;
+    Node* down;
+    int count; // Current number of the elements in the queue
 public:
-    MyQueue(int =10);          // the default constructor
-    MyQueue(const MyQueue<T> &); // copy constructor
-    ~MyQueue();                // the destructor
-
-    void enqueue(const T &); // add an element to the queue
-    T dequeue(); // Remove element from a queue
-    void printQueue();
+    MyQueue();
+    virtual ~MyQueue();
+    T dequeue(); // Removes the first elements of the queue and returns it's value
+    void enqueue (T); // Adds new element to the end of the queue
+    void clear(); // Removes all elements of the queue
+    int size() const; // Return current number of the elements of the queue
+    bool isEmpty() const; // Returns true if current number of the elements is 0
+    T peek() const; // Return value of the first element without removing it.
 };
 
-// implementation of template class MyQueue
-
-// the default constructor
-template<typename T>
-MyQueue<T>::MyQueue(int sizeQueue) :
-    size(sizeQueue), // Initialize constants
-    begin(0), end(0), elemCT(0)
-{
-    // additional position will help us distinguish between the end and the beginning of the queue
-    queuePtr = new T[size + 1];
+/* Constructor */
+template <typename T>
+MyQueue<T> :: MyQueue(){
+    count = 0;
+    top = down = NULL;
 }
 
-// copy constructor
+/* Method: enqueue
+ * Usage: queue.enqueue(value);
+ * -----------------------------------------------
+ * Adds new element to the end of the queue
+ */
 template<typename T>
-MyQueue<T>::MyQueue(const MyQueue &otherQueue) :
-    size(otherQueue.size) , begin(otherQueue.begin),
-    end(otherQueue.end), elemCT(otherQueue.elemCT),
-    queuePtr(new T[size + 1])
-{
-    for (int ix = 0; ix < size; ix++)
-        queuePtr[ix] = otherQueue.queuePtr[ix]; // copy queue
+void MyQueue<T> :: enqueue(T newValue){
+    Node *newNode = new Node;
+    newNode->value = newValue;
+    newNode->link = NULL;
+    if(top == NULL) { //if queue is empty
+        top = down = newNode;
+    } else {
+        down->link = newNode;
+        down  = newNode;
+    }
+    count++;
 }
 
-// destructor class MyQueue
+/* Method: dequeue
+ * Usage: value = queue.dequeue();
+ * ---------------------------------------------
+ * Removes the first elements of the queue and returns it's value
+ */
 template<typename T>
-MyQueue<T>::~MyQueue()
-{
-    delete [] queuePtr;
+T MyQueue<T> :: dequeue(){
+    if (count == 0){
+        std:: cout << "Error: queue is empty!!!" << std:: endl;
+        exit(1);
+    }
+    Node *tmpNode = top;
+    top = top->link;
+    T tmpValue = tmpNode->value;
+    count--;
+    delete tmpNode; //prevent memory leaks
+    return tmpValue;
 }
 
-// the ability to add an element to the queue
+/* Method: clear
+ * Usage: queue.clear();
+ * ---------------------------------------------
+ * Removes all elements of the queue
+ */
 template<typename T>
-void MyQueue<T>::enqueue(const T &newElem)
-{
-    // check whether an empty seat in the queue
-    assert( elemCT < size );
-
-    // Note that the queue starts filled with index 0
-    queuePtr[end++] = newElem;
-
-    elemCT++;
-
-    // Note that the queue starts filled with index 0
-    if (end > size)
-        end -= size + 1; // return end on top of the queue
+void MyQueue<T> :: clear(){
+    for(int i = 0; i < count; i++){
+        Node *tmpNode = top;
+        top = top->link;
+        delete tmpNode; //prevent memory leaks
+    }
+    count = 0;
 }
 
-// return end on top of the queue
+/* Method: size
+ * Usage: int size = queue.size();
+ * --------------------------------------------
+ * Return current number of the elements of the
+ * queue
+ */
 template<typename T>
-T MyQueue<T>::dequeue()
-{
-    // check whether the queue items
-    assert( elemCT > 0 );
-
-    T returnValue = queuePtr[begin++];
-    elemCT--;
-
-    // checking circular fill the queue
-    if (begin > size)
-        begin -= size + 1; // return behin the queue
-
-    return returnValue;
+int MyQueue<T> :: size() const{
+    return count;
 }
 
+/* Method: isEmpty
+ * Usage: if(queue.isEmpty)...
+ * --------------------------------------------
+ * Returns true if current number of the elements
+ * is 0.
+ */
 template<typename T>
-void MyQueue<T>::printQueue()
-{
-    cout << "Queue: ";
+bool MyQueue<T> :: isEmpty() const{
+    return count == 0;
+}
 
-    if (end == 0 && begin == 0)
-        cout << " an empty\n";
-    else
-    {
-        for (int ix = end; ix >= begin; ix--)
-            cout << queuePtr[ix] << " ";
-        cout << endl;
+/* Method: peek
+ * Usage: value = queue.peek();
+ * ---------------------------------------------
+ * Return value of the first element without removing it.
+ */
+template<typename T>
+T MyQueue<T> :: peek() const{
+    return top->value;
+}
+
+/* Destructor */
+template <typename T>
+MyQueue<T> :: ~MyQueue(){
+    for(int i = 0; i < count; i++){
+        Node *tmpNode = top;
+        top = top->link;
+        delete tmpNode;
     }
 }
 
-#endif // MyQueue_H
+#endif // MYQUEUE_H

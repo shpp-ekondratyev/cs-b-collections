@@ -6,30 +6,17 @@ using namespace std;
 
 int main ()
 {
-    MyQueue<char> firstQueue(14); // class queue object
+    MyQueue<int> queue;
 
-    int ct = 1;
-    char ch;
-    cout << "Add items to the queue :\n";
-    while (ct++ < 14)
-    {
-        cin >> ch;
-        firstQueue.enqueue(ch);
+    for(int i = 0; i < 10; i++){
+        queue.enqueue(i);
     }
 
-    firstQueue.printQueue(); // output queue
-    cout << "After removing 3-th items from the queue :\n";
-    // remove an item from the queue
-    firstQueue.dequeue();
-    firstQueue.dequeue();
-    firstQueue.dequeue();
+    cout << "Size: " << queue.size() << endl;
 
-    firstQueue.printQueue(); // output queue
-
-    cout << "\n\nWorked copy constructor:\n";
-    MyQueue<char> newQueue(firstQueue);
-
-    newQueue.printQueue(); // output queue
+    for(int i = 0; queue.size(); i++){
+        cout << queue.dequeue()<< endl;
+    }
 
   return 0;
 }

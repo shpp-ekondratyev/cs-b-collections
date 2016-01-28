@@ -6,31 +6,24 @@ using namespace std;
 
 int main()
 {
-    MyStack<char> stackSymbol(5);
-    int ct = 0;
-    char ch;
-    cout << "Enter 5 characters for the push to stack :";
-    while (ct++ < 5)
-    {
-        cin >> ch;
-        stackSymbol.push(ch); // put the items in the stack
+    MyStack<int> stack;
+
+    for (int i = 0; i < 10; i++){
+        stack.push(i);
     }
 
-    cout << endl;
+    cout << "Size: " << stack.size() << endl;
+    cout << "Peek: " << stack.top() << endl;
+    cout << "isEmpty: " << stack.isEmpty() << endl;
 
-    stackSymbol.printStack(); // printing stack
+    for (int i = 0; i < 10; i++){
+        int a = stack.pop();
+        cout << "Pop: " << a << endl;
+    }
 
-    cout << "\n\nRemove an element from the stack\n";
-    stackSymbol.pop();
+    stack.clear();
 
-    stackSymbol.printStack(); // printing stack
-
-    MyStack<char> newStack(stackSymbol);
-
-    cout << "\n\nWorked copy constructor!\n";
-    newStack.printStack();
-
-    cout << "The second element in the queue:"<< newStack.Peek(2) << endl;
+    cout << "isEmpty: " << stack.isEmpty() << endl;
 
     return 0;
 }

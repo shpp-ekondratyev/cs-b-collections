@@ -1,119 +1,141 @@
+/* File: mystack.h
+ * -----------------------------------
+ * This file exports a simple implementation
+ * of Stack class based on the dynamic array.
+ */
+
 #ifndef MYSTACK_H
 #define MYSTACK_H
 
-#include <cassert> // for assert
 #include <iostream>
 
-#include <iomanip> // for setw
-
+/* Class MyStack<T>
+ * --------------------------------
+ * This class implements a stack of a specified value type.
+ */
 template <typename T>
-class MyStack
-{
+class MyStack {
 private:
-    T *stackPtr;                      // a pointer to the stack
-    const int size;                   // the maximum number of elements in the stack
-    int top;                          // the number of the current stack element
+    static const int START_SIZE = 10;
+    T *array; //  Dynamic array for storing elements
+    int currentSize; //  Current size of the dynamic array
+    int count; // Current number of the element in array
+    void extendArray(); // Increases dynamyc arra in two times
 public:
-    MyStack(int = 10);                  // the default stack size is 10 items
-    MyStack(const MyStack<T> &);          // copy constructor
-    ~MyStack();                         // the destructor
-
-    inline void push(const T & );     // put the item in the top of the stack
-    inline T pop();                   // remove an item from the top of the stack and return it
-    inline void printStack();         // stack output on screen
-    inline const T &Peek(int ) const; // the n-th element from the top of the stack
-    inline int getStackSize() const;  // get the size of the stack
-    inline T *getPtr() const;         // get a pointer to the stack
-    inline int getTop() const;        // get the number of the current item in the stack
+    MyStack(); // Initializes a new empty stack
+    virtual ~MyStack(); // Frees memory allocated for array in the heap.
+    void push(T value); // Pushes the specified value on the stack
+    T pop(); // Removes top element of the stack and returns it's value
+    void clear(); // Removes all elements of the stack.
+    bool isEmpty() const; // Returns true if stack is empty
+    T top() const; // Returns value of the top element of the stack without removing it.
+    int size() const; // Returns current number of the element in the stack
 };
 
-// implementation of a class template MyStack
-
-// Stack constructor
+/* Constructor */
 template <typename T>
-MyStack<T>::MyStack(int maxSize) :
-    size(maxSize) // Initialize constants
-{
-    stackPtr = new T[size]; // allocate memory for the stack
-    top = 0; // initialize the current element zero;
+MyStack<T>::MyStack(){
+    array = new T[START_SIZE];
+    currentSize = START_SIZE;
+    count = 0;
 }
 
-// copy constructor
+/* Destructor */
 template <typename T>
-MyStack<T>::MyStack(const MyStack<T> & otherStack) :
-    size(otherStack.getStackSize()) // Initialize constants
-{
-    stackPtr = new T[size]; // allocate memory for the new stack
-    top = otherStack.getTop();
-
-    for(int ix = 0; ix < top; ix++)
-        stackPtr[ix] = otherStack.getPtr()[ix];
+MyStack<T>::~MyStack(){
+    delete[] array;
 }
 
-// a destructor function during Stack
+/* Method: push
+ * Usage: stack.push(value);
+ * -----------------------------------------------------
+ * Pushes the specified value on the stack
+ */
 template <typename T>
-MyStack<T>::~MyStack()
-{
-    delete [] stackPtr; //Remove stack
+void MyStack<T>::push(T value){
+    if (count == currentSize){ //check for a free space for new element
+        extendArray();
+    }
+    array[count] = value;
+    count++;
 }
 
-// function add an item to the stack
+/* Method: pop
+ * Usage: stack.pop();
+ * ----------------------------------------------------
+ * Removes top element of the stack and returns it's value
+ */
 template <typename T>
-inline void MyStack<T>::push(const T &value)
-{
-    // check the stack size
-    assert(top < size); // current item number must be less than the size of the stack
+T MyStack<T>::pop(){
+    if (isEmpty()){
+        std:: cout << "Error: Stack is empty!!!" << std::endl;
+        exit(1);
+    }
+    count--;
+    return array[count];
 
-    stackPtr[top++] = value; // put an item onto the stack
 }
 
-// the function deletes the item from the stack
+/* Method: clear
+ * Usage: stack.clear();
+ * -----------------------------------------------------
+ * Removes all elements of the stack.
+ */
 template <typename T>
-inline T MyStack<T>::pop()
-{
-    // check the stack size
-    assert(top > 0); // current item number must be greater than 0
-
-    stackPtr[--top]; // delete an element from the stack
+void MyStack<T>::clear(){
+    count = 0;
 }
 
-// the function returns the n-th element from the top of the stack
-template <class T>
-inline const T &MyStack<T>::Peek(int nom) const
-{
-  //
-  assert(nom <= top);
-
-  return stackPtr[top - nom]; // return the n-th element from the stack
+/* Method: isEmpty
+ * Usage: stack.isEmpty();
+ * -----------------------------------------------------
+ * Returns true if stack is empty
+ */
+template <typename T>
+bool MyStack<T>::isEmpty() const {
+    return count == 0;
 }
 
-// stack output on screen
+/* Method: top
+ * Usage: stack.top();
+ * -----------------------------------------------------
+ * Returns value of the top element of the stack
+ * without removing it.
+ */
 template <typename T>
-inline void MyStack<T>::printStack()
-{
-    for (int ix = top - 1; ix >= 0; ix--)
-        cout << "|" << setw(4) << stackPtr[ix] << endl;
+T MyStack<T>::top() const {
+    if (isEmpty()){
+        std:: cout << "Error: Stack is empty!!!" << std::endl;
+        exit(1);
+    }
+    return array[count-1];
 }
 
-// return the size of the stack
+/* Method: size
+ * Usage: stack.size();
+ * -----------------------------------------------------
+ * Returns current number of the element in the stack
+ */
 template <typename T>
-inline int MyStack<T>::getStackSize() const
-{
-    return size;
+int MyStack<T>::size() const{
+    return count;
 }
 
-// return a pointer to the stack (for copy constructor)
+/* Method: extendArray
+ * Usage: extendArray();
+ * ------------------------------------------------
+ * Increases dynamyc arra in two times
+ */
 template <typename T>
-inline T *MyStack<T>::getPtr() const
-{
-    return stackPtr;
-}
+void MyStack<T>::extendArray(){
+    T *oldArray = array;
+    currentSize *= 2;
+    array = new T[currentSize];
 
-// return the size of the stack
-template <typename T>
-inline int MyStack<T>::getTop() const
-{
-    return top;
+    for (int i = 0; i < count; i++){
+        array[i] = oldArray[i];
+    }
+    delete[] oldArray;
 }
 
 #endif // MYSTACK_H
